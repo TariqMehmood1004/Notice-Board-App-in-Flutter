@@ -61,13 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
               TextButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(AppColors.cardBGColor),
-                  shape: MaterialStateProperty.all<OutlinedBorder>(
-                    RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: AppColors.greyColor,
-                      ),
-                    ),
-                  ),
                 ),
                 onPressed: () {
                   Timer(const Duration(milliseconds: 750), (){

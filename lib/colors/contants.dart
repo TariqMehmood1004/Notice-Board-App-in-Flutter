@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:app/email_auth/login_auth.dart';
+import 'package:app/screens/crud_operations/searching_query.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -200,40 +201,32 @@ showModalBoxSearch(BuildContext context) {
                 ),
               ),
               const SizedBox(height: 5.0,),
-              TextField(
-                controller: BottomSheetModel().searchController,
-                decoration: const InputDecoration(labelText: 'Type title'),
-              ),
-              const SizedBox(height: 20.0,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: (){
-
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.black,
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(
-                          width: 1.0,
-                          color: AppColors.transparent,
-                        ),
-                      ), child: Text(
-                      'Search',
-                      style: TextStyle(
-                        color: AppColors.cardBGColor,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w600,
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: TextField(
+                  controller: BottomSheetModel().searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search your query...',
+                    hintStyle: TextStyle(
+                      fontSize: 12.0,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w300,
                     ),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: AppColors.primary,
                     ),
                   ),
-                ],
+                ),
               ),
+              const SizedBox(height: 25.0,),
+
+              const SearchScreen(),
+
             ],
           ),
         ),

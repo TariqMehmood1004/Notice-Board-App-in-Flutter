@@ -1,6 +1,7 @@
 
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
+import 'package:app/colors/contants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +9,7 @@ class BottomSheetModel {
   final TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> searchResults = [];
 
-  Future<void> performSearch() async {
-    // Get the search query from the text controller
-    final String searchQuery = searchController.text;
-
+  Future<void> performSearch(BuildContext context, String searchQuery) async {
     // Access the Firestore collection that contains the user data
     final CollectionReference usersCollection =
     FirebaseFirestore.instance.collection('users');
@@ -24,8 +22,12 @@ class BottomSheetModel {
 
     // Clear the previous search results
     searchResults.clear();
-    searchResults.addAll(querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList());
+    searchResults.addAll(
+      querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList(),
+    );
 
+    showSnackBar(context, msg: searchResults.toString());
+    debugPrint("You have searched: ${searchResults.toString()}");
   }
 }
 
@@ -33,6 +35,7 @@ class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SearchScreenState createState() => _SearchScreenState();
 }
 
@@ -44,7 +47,7 @@ class _SearchScreenState extends State<SearchScreen> {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(6.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -55,7 +58,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () async {
-                      await _bottomSheetModel.performSearch();
+                      await _bottomSheetModel.performSearch(
+                          context,
+                          _bottomSheetModel.searchController.text.toString(),
+                      );
                       // Update UI with search results
                       setState(() {});
                     },
