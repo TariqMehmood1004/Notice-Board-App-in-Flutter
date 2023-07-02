@@ -74,14 +74,19 @@ class _HomeScreenState extends State<TimeTableInchargeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children:  [
               Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),
-              IconButton(
-                color: AppColors.primary,
-                splashColor: AppColors.color2,
-                splashRadius: 22.0,
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.cardBGColor),
+                ),
                 onPressed: () {
-                  debugPrint("Menu icon clicked.");
+                  Timer(const Duration(milliseconds: 750), (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginController())
+                    );
+                  });
                 },
-                icon: Icon(MdiIcons.menu, color: AppColors.primary,),
+                child: Text("Login", style: TextStyle(color: AppColors.primary, fontSize: 12.0, fontWeight: FontWeight.w600),),
               ),
             ],
           ),

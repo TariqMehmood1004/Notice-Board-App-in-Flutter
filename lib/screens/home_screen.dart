@@ -49,15 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children:  [
               Expanded(child: Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),),
-              IconButton(
-                color: AppColors.primary,
-                splashColor: AppColors.color2,
-                splashRadius: 22.0,
-                onPressed: () {
-                  showModalBoxSearch(context);
-                },
-                icon: Icon(Icons.search_outlined, color: AppColors.primary,),
-              ),
+             
               TextButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(AppColors.cardBGColor),
