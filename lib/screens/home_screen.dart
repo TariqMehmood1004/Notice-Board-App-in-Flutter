@@ -3,14 +3,11 @@
 
 import 'dart:async';
 import 'package:app/colors/colors.dart';
-import 'package:app/colors/contants.dart';
-import 'package:app/screens/crud_operations/searching_query.dart';
 import 'package:app/screens/users_nav/users_nav.dart';
 import 'package:app/screens/users_screen/users_home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../email_auth/login_auth.dart';
 
@@ -49,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children:  [
               Expanded(child: Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),),
-             
+
               TextButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(AppColors.cardBGColor),
