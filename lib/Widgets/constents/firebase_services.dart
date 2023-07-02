@@ -92,6 +92,30 @@ class FirebaseService {
     }
   }
 
+
+  final CollectionReference _usersCollection =
+  FirebaseFirestore.instance.collection('users');
+
+  Future<List<Map<String, dynamic>>> searchUsers(BuildContext context, String searchQuery) async {
+    try {
+      QuerySnapshot querySnapshot = await _usersCollection
+          .where('name', isGreaterThanOrEqualTo: searchQuery)
+          .where('name', isLessThanOrEqualTo: '$searchQuery\uf8ff')
+          .get();
+
+      List<Map<String, dynamic>> searchResults = querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      showSnackBar(context, msg: searchResults.toString());
+      return searchResults;
+    } catch (e) {
+      // Handle any potential errors here
+      showSnackBar(context, msg: 'Error searching users: $e');
+      return [];
+    }
+  }
+
 }
 
 

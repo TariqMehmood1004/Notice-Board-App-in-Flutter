@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import '../Widgets/constents/firebase_services.dart';
 import 'colors.dart';
 
 Color generateRandomColorBorder() {
@@ -207,6 +208,9 @@ showModalBoxSearch(BuildContext context) {
                   borderRadius: BorderRadius.circular(40),
                 ),
                 child: TextField(
+                  onChanged: (String val){
+                    FirebaseService().searchUsers(context, val);
+                  },
                   controller: BottomSheetModel().searchController,
                   decoration: InputDecoration(
                     hintText: 'Search your query...',
@@ -221,6 +225,7 @@ showModalBoxSearch(BuildContext context) {
                       color: AppColors.primary,
                     ),
                   ),
+
                 ),
               ),
               const SizedBox(height: 25.0,),

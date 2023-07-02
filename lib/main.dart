@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          body: HomeScreen(),
+          body: AdminScreen(),
         ),
       ),
     );
