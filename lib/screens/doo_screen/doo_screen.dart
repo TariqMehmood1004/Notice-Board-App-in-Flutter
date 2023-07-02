@@ -39,21 +39,6 @@ class _HomeScreenState extends State<DOOScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        elevation: 0.23,
-        backgroundColor: AppColors.black,
-        onPressed: () {
-          showModalBox(
-            context,
-            "Search the Notifications",
-            _searchController,
-            "DooNotifications",
-            "SUBJECT"
-          );
-          _searchController.clear();
-        },
-        child: Icon(Icons.search_outlined, color: AppColors.cardBGColor,),
-      ),
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,

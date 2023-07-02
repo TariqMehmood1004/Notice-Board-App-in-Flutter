@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'package:app/colors/colors.dart';
 import 'package:app/email_auth/login_auth.dart';
+import 'package:app/screens/fyp_committe_screens/search.dart';
 import 'package:app/screens/fyp_committe_screens/show_tasks.dart';
 import 'package:app/screens/solomon_bottom_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<FYPScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children:  [
-              Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),
+              Text("Noticed Board | FYP".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),
               IconButton(
                 color: AppColors.primary,
                 splashColor: AppColors.color2,
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<FYPScreen> {
       body: pages[_currentIndex],
       bottomNavigationBar: Container(
         // padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        margin: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0),
+        margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 8.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
           color: AppColors.bottomNavBGColor,
@@ -94,15 +95,24 @@ class _HomeScreenState extends State<FYPScreen> {
             /// Home
             SalomonBottomBarItem(
               icon: const Icon(Icons.home),
-              title: const Text("Home Page"),
+              title: const Text("Home"),
               selectedColor: Colors.purple,
             ),
 
             SalomonBottomBarItem(
               icon: const Icon(Icons.add),
-              title: const Text("Add Time Table"),
+              title: const Text("Add"),
               selectedColor: Colors.cyan ,
             ),
+
+
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.search_outlined),
+              title: const Text("Search"),
+              selectedColor: Colors.purple,
+            ),
+
+
 
           ],
         ),
@@ -113,6 +123,7 @@ class _HomeScreenState extends State<FYPScreen> {
   List pages = [
     ShowFYP(),
     AddFYPProject(),
+    SearchFYP(),
   ];
 
 

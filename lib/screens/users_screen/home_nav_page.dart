@@ -12,6 +12,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   final _searchController = TextEditingController();
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _allResults = [];
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _resultLists = [];

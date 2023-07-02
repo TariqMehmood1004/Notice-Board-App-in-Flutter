@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 
 import '../../colors/contants.dart';
 
-class ShowFYP extends StatefulWidget {
-  const ShowFYP({super.key});
+class SearchFYP extends StatefulWidget {
+  const SearchFYP({super.key});
 
   @override
-  State<ShowFYP> createState() => _ShowAllTasksState();
+  State<SearchFYP> createState() => _ShowAllTasksState();
 }
 
-class _ShowAllTasksState extends State<ShowFYP> {
+class _ShowAllTasksState extends State<SearchFYP> {
 
   final _taskCollection = FirebaseFirestore.instance.collection('fypProjects');
 
@@ -230,64 +230,67 @@ class _ShowAllTasksState extends State<ShowFYP> {
         child: Column(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.symmetric(horizontal: 17.0, vertical: 8.0),
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
-              decoration: BoxDecoration(
-                color: AppColors.transparent,
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: Text(
-                "Final Year Projects",
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14.0,
-                ),
-              ),
-            ),
-            const SizedBox(height: 15.0,),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-              ),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _taskCollection.snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-
-                  if (snapshot.data!.docs.isEmpty) {
-                    return const Text('No tasks found.');
-                  }
-
-                  return Expanded(
-                    child: ListView(
+              padding: const EdgeInsets.all(6.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 2.0),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        border: InputBorder.none,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                    width: double.infinity,
+                    child: Text(
+                      "Search the list",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 4.0, left: 12.0, right: 12.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: ListView.builder(
                       shrinkWrap: true,
-                      children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                        Map<String, dynamic> task = document.data() as Map<String, dynamic>;
-                        String title = task['FYP_Title'];
-                        String description = task['Description'];
-                        String members = task['Members'];
-                        String supervisor = task['Supervisor'];
-
+                      itemCount: _resultLists.length,
+                      itemBuilder: (context, index) {
+                        final result = _resultLists[index].data();
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 4.0),
-                          padding: const EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.only(bottom: 5.0),
                           decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.0),
                             color: generateRandomColor(),
-                            borderRadius: BorderRadius.circular(5.0),
                           ),
                           child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 7.0),
                             title: Text(
-                              title.toUpperCase(),
+                              result['FYP_Title'].toString().toUpperCase(),
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
@@ -295,57 +298,25 @@ class _ShowAllTasksState extends State<ShowFYP> {
                               ),
                             ),
                             subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const SizedBox(height: 6.0,),
-                                Text(
-                                  "Description: \n$description",
-                                  style: TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 10.0,
-                                  ),
-                                ),
-                                Text(
-                                  "Member(s): \n$members",
-                                  style: TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 10.0,
-                                  ),
-                                ),
-                                Text(
-                                  "Supervisor: \n$supervisor",
-                                  style: TextStyle(
-                                    color: AppColors.secondary,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 10.0,
-                                  ),
-                                ),
+                                Text(result['Description'].toString()),
+                                Text(result['Members'].toString()),
+                                Text(result['Supervisor'].toString()),
                               ],
-                            ),
-                            leading: IconButton(
-                              icon: Icon(Icons.edit_outlined, color: AppColors.primary),
-                              onPressed: () {
-                                _titleController.text = title;
-                                _descriptionController.text = description;
-                                _membersController.text = members;
-                                _supervisorController.text = supervisor;
-                                showModalBox(document.id);
-                              },
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete_outline, color: AppColors.primary),
-                              onPressed: () => _deleteTask(document.id),
                             ),
                           ),
                         );
-                      }).toList(),
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
+
           ],
         ),
       ),

@@ -122,26 +122,6 @@ class _LoginControllerState extends State<LoginController> {
                              ),
                            ),
 
-                           //Hide the code for unauthorized access.
-                           // const SizedBox(height: 30.0),
-                           // InkWell(
-                           //   onTap: () {
-                           //     Timer(const Duration(milliseconds: 750), (){
-                           //       Navigator.push(context, MaterialPageRoute(
-                           //           builder: (context)=> const SignUpController()));
-                           //     });
-                           //   },
-                           //   splashColor: AppColors.transparent,
-                           //   hoverColor: AppColors.transparent,
-                           //   child: Text(
-                           //     "Create an account?",
-                           //     style: TextStyle(
-                           //       fontStyle: FontStyle.italic,
-                           //       color: AppColors.secondary,
-                           //       fontSize: 12.0,
-                           //     ),
-                           //   ),
-                           // ),
                          ],
                        )
                    );

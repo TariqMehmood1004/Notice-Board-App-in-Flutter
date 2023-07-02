@@ -44,50 +44,6 @@ class _SignUpControllerState extends State<HandleUserAuth> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-  //
-  // createUser() async {
-  //   String email = _emailController.text.trim();
-  //   String password = _passwordController.text.trim();
-  //   String userRoll = _userNameController.text.trim();
-  //   String confirmPassword = _confirmPasswordController.text.trim();
-  //
-  //   try {
-  //     if(email == "" || password == "" || confirmPassword == "" || userRoll == "")
-  //     {
-  //       showSnackBar(msg: "Please fill all the required fields.");
-  //     }
-  //     else if(password != confirmPassword)
-  //     {
-  //       debugPrint("Passwords do not match!");
-  //       showSnackBar(msg: "Passwords do not match!");
-  //     } else {
-  //       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-  //       User? user = userCredential.user;
-  //
-  //       // Save user information to Firestore collection
-  //       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-  //         'userRole': _userNameController.text.trim(),
-  //         'email': _emailController.text.trim(),
-  //
-  //         /*
-  //         "uid": "user_uid",          // Unique identifier for the user
-  //         "name": "John Doe",         // User's display name
-  //         "email": "johndoe@example.com",   // User's email address
-  //         "blocked": false,           // Boolean field indicating if the user is blocked or not
-  //         "friends": [],              // Array field to store the user's friends' UIDs
-  //         "createdAt": Timestamp,     // Timestamp indicating when the user was created
-  //         // ... additional fields based on your app's requirements
-  //       }
-  //       */
-  //       });
-  //
-  //       showSnackBar(msg: "User created successfully.");
-  //     }
-  //   }
-  //   on FirebaseAuthException catch(e){
-  //     showSnackBar(msg: e.code.toString());
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
