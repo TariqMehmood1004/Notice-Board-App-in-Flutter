@@ -2,8 +2,9 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors
 
 import 'dart:async';
-
 import 'package:app/colors/colors.dart';
+import 'package:app/colors/contants.dart';
+import 'package:app/screens/crud_operations/searching_query.dart';
 import 'package:app/screens/users_nav/users_nav.dart';
 import 'package:app/screens/users_screen/users_home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,22 +41,43 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.light,
         elevation: 0,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children:  [
-              Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),
+              Expanded(child: Text("Noticed Board".toUpperCase(), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w600),),),
               IconButton(
                 color: AppColors.primary,
                 splashColor: AppColors.color2,
                 splashRadius: 22.0,
                 onPressed: () {
-                  debugPrint("Menu icon clicked.");
+                  showModalBoxSearch(context);
                 },
-                icon: Icon(MdiIcons.menu, color: AppColors.primary,),
+                icon: Icon(Icons.search_outlined, color: AppColors.primary,),
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.cardBGColor),
+                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                    RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: AppColors.greyColor,
+                      ),
+                    ),
+                  ),
+                ),
+                onPressed: () {
+                  Timer(const Duration(milliseconds: 750), (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginController())
+                    );
+                  });
+                },
+                child: Text("Login", style: TextStyle(color: AppColors.primary, fontSize: 12.0, fontWeight: FontWeight.w600),),
               ),
             ],
           ),
@@ -63,18 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       backgroundColor: AppColors.white,
       body: pages[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: (){
-          Timer(const Duration(milliseconds: 750), (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginController())
-            );
-          });
-        },
-        child: Icon(Icons.login_rounded, color: AppColors.white, size: 20.0,),
-      ),
 
     );
   }
@@ -82,7 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List pages = [
     UsersHomeScreen(),
     UsersNavController(),
-
   ];
 
 
@@ -100,6 +109,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
-
 }
+

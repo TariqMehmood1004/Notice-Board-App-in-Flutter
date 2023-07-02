@@ -36,7 +36,7 @@ class _ShowTimeTableScreenState extends State<ShowTimeTableScreen> {
             child: Column(
               children: [
                Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 3.0), child: Align(alignment: Alignment.topLeft, child: Text(
-                 "Other Lectures",
+                 "Time Table Schedule",
                  style: TextStyle(
                    color: AppColors.primary,
                    fontWeight: FontWeight.bold,

@@ -171,6 +171,78 @@ showModalBox(BuildContext context, String headTitle, TextEditingController query
 }
 
 
+showModalBoxSearch(BuildContext context) {
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    backgroundColor: AppColors.transparent,
+    builder: (context) {
+      return Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: BoxDecoration(
+          color: AppColors.cardBGColor,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 55.0, vertical: 4.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20.0,),
+              Text(
+                "Search",
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight:
+                  FontWeight.bold,
+                  fontSize: 20.0,
+                ),
+              ),
+              const SizedBox(height: 5.0,),
+              TextField(
+                controller: BottomSheetModel().searchController,
+                decoration: const InputDecoration(labelText: 'Type title'),
+              ),
+              const SizedBox(height: 20.0,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: (){
+
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.black,
+                        borderRadius: BorderRadius.circular(6.0),
+                        border: Border.all(
+                          width: 1.0,
+                          color: AppColors.transparent,
+                        ),
+                      ), child: Text(
+                      'Search',
+                      style: TextStyle(
+                        color: AppColors.cardBGColor,
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+
 showQuickAlertBox(BuildContext context, QuickAlertType quickAlertType, String text) {
   QuickAlert.show(
     context: context,
@@ -179,3 +251,58 @@ showQuickAlertBox(BuildContext context, QuickAlertType quickAlertType, String te
   );
 }
 
+
+void deleteRecord(BuildContext context, String id, String collectionName) async {
+  try {
+    final customGetCollection = FirebaseFirestore.instance.collection(collectionName);
+    await customGetCollection.doc(id).delete();
+    showSnackBar(context, msg: "$collectionName deleted successfully.");
+  } on FirebaseAuthException catch (e) {
+    showSnackBar(context, msg: e.code.toString());
+  }
+}
+
+
+Future<void> blockAccount(BuildContext context, bool isBlocked, String collectionName, String userEmail) async {
+  try {
+    // Get the reference to the user document
+    DocumentReference userRef =
+    FirebaseFirestore.instance.collection(collectionName).doc(userEmail);
+
+    // Update the 'isBlocked' field in Firestore
+    await userRef.update({'isBlocked': isBlocked});
+    showSnackBar(context, msg: 'User blocked $userEmail.');
+  } on FirebaseAuthException catch (e) {
+    // Handle any errors
+    showSnackBar(context, msg: 'Error blocking user: ${e.code.toString()}');
+  }
+}
+
+
+
+
+class BottomSheetModel {
+  final TextEditingController searchController = TextEditingController();
+  List<Map<String, dynamic>> searchResults = [];
+
+  Future<void> performSearch() async {
+    // Get the search query from the text controller
+    final String searchQuery = searchController.text;
+
+    // Access the Firestore collection that contains the user data
+    final CollectionReference usersCollection =
+    FirebaseFirestore.instance.collection('users');
+
+    // Perform the search query using Firestore
+    QuerySnapshot querySnapshot = await usersCollection
+        .where('name', isGreaterThanOrEqualTo: searchQuery)
+        .where('name', isLessThanOrEqualTo: '$searchQuery\uf8ff')
+        .get();
+
+    // Clear the previous search results
+    searchResults.clear();
+
+    // Update the searchResults list with the search query results
+    searchResults.addAll(querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList());
+  }
+}

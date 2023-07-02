@@ -1,7 +1,10 @@
+import 'package:app/Widgets/constents/firebase_services.dart';
 import 'package:app/colors/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../colors/contants.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,26 +15,22 @@ class HomePage extends StatefulWidget {
 
 class _ShowAllTasksState extends State<HomePage> {
 
-  final _taskCollection = FirebaseFirestore.instance.collection('users');
+  // final _customGetCollection = FirebaseFirestore.instance;
+  final _collection = FirebaseFirestore.instance.collection('users');
 
   // Variables to store the task input values
   final _emailController = TextEditingController();
+  final _userNameController = TextEditingController();
   final _roleController = TextEditingController();
+
+ FirebaseService firebaseService = FirebaseService();
 
   @override
   void dispose() {
     _emailController.dispose();
+    _userNameController.dispose();
     _roleController.dispose();
     super.dispose();
-  }
-
-  void _deleteTask(String taskId) async {
-    try {
-      await _taskCollection.doc(taskId).delete();
-      showSnackBar(msg: "Task deleted successfully.");
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(msg: e.code.toString());
-    }
   }
 
   void showSnackBar({String msg = "message"}) {
@@ -83,6 +82,10 @@ class _ShowAllTasksState extends State<HomePage> {
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 TextField(
+                  controller: _userNameController,
+                  decoration: const InputDecoration(labelText: 'User Name'),
+                ),
+                TextField(
                   controller: _roleController,
                   decoration: const InputDecoration(labelText: 'User Role'),
                 ),
@@ -119,6 +122,7 @@ class _ShowAllTasksState extends State<HomePage> {
                         FirebaseFirestore.instance.collection("users").doc(userRole).update(
                             {
                               'email': _emailController.text.trim(),
+                              'name': _userNameController.text.trim(),
                               'userRole': _roleController.text.trim()
                             }
                         );
@@ -173,123 +177,167 @@ class _ShowAllTasksState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.transparent,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.symmetric(horizontal: 17.0, vertical: 8.0),
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+            margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+            padding: const EdgeInsets.only(top: 15.0),
             decoration: BoxDecoration(
-              color: AppColors.transparent,
-              borderRadius: BorderRadius.circular(4.0),
+              color: AppColors.light,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Active Users",
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
+                Container(
+                  margin: const EdgeInsets.only(left: 20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Active Users",
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const SizedBox(height: 2.0,),
+                      Text(
+                        "Long press to block the users.",
+                        style: TextStyle(
+                          color: AppColors.offGreen,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 10.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 5.0,),
-                Text(
-                  "Long press to hide/show the functionality",
-                  style: TextStyle(
-                    color: AppColors.offGreen,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 10.0,
+                const Divider(),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.transparent,
+                  ),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _collection.snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      if (snapshot.data!.docs.isEmpty) {
+                        return const Text('No tasks found.');
+                      }
+
+                      return Expanded(
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                            Map<String, dynamic> task = document.data() as Map<String, dynamic>;
+                            String uid = task['uid'];
+                            String userEmail = task['email'];
+                            String userName = task['name'];
+                            String userRole = task['userRole'];
+                            bool isBlocked = task['blocked'];
+
+                            return Container(
+                                margin: const EdgeInsets.only(bottom: 2.0),
+                                decoration: BoxDecoration(
+                                  color: isBlocked ? AppColors.orange : AppColors.transparent,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: AppColors.white,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                  ),
+                                  child:  ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 5.0),
+                                    onLongPress: () {
+                                      isBlocked =! isBlocked;
+                                      // blockAccount(context, isBlocked, 'users', userEmail);
+                                      firebaseService.blockUser(context, uid, isBlocked);
+                                      setState(() { });
+                                    },
+                                    title: Text(
+                                      userEmail,
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Blocked: $isBlocked',
+                                          style: TextStyle(
+                                            color: AppColors.secondary,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                        Text(
+                                          'User name: $userName',
+                                          style: TextStyle(
+                                            color: AppColors.secondary,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                        Text(
+                                          'User role: $userRole',
+                                          style: TextStyle(
+                                            color: AppColors.secondary,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    leading: IconButton(
+                                      icon: Icon(Icons.edit_outlined, color: AppColors.primary),
+                                      onPressed: () {
+                                        _emailController.text = userEmail;
+                                        _userNameController.text = userName;
+                                        _roleController.text = userRole;
+                                        showModalBox(document.id);
+                                      },
+                                    ),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.delete_outline, color: AppColors.primary),
+                                      onPressed: () => deleteRecord(context, document.id, 'users'),
+                                    ),
+                                  ),
+                                )
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 15.0,),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-            ),
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _taskCollection.snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
 
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-
-                if (snapshot.data!.docs.isEmpty) {
-                  return const Text('No tasks found.');
-                }
-
-                return Expanded(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                      Map<String, dynamic> task = document.data() as Map<String, dynamic>;
-                      String userEmail = task['email'];
-                      String userRole = task['userRole'];
-                      bool isBlocked = task['isBlocked'] ?? false;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 2.0),
-                        decoration: BoxDecoration(
-                          color: isBlocked ? AppColors.offGreen : AppColors.buttonColor,
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: ListTile(
-                          onLongPress: () {
-                            isBlocked = !isBlocked;
-                            blockUser(userEmail, isBlocked);
-                            setState(() { });
-                            showSnackBar(msg: "blocked $userEmail");
-                          },
-                          title: Text(
-                            userEmail,
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                          subtitle: Text(
-                            userRole,
-                            style: TextStyle(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w300,
-                              fontSize: 10.0,
-                            ),
-                          ),
-                          leading: IconButton(
-                            icon: Icon(Icons.edit_outlined, color: AppColors.primary),
-                            onPressed: () {
-                              _emailController.text = userEmail;
-                              _roleController.text = userRole;
-                              showModalBox(document.id);
-                            },
-                          ),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete_outline, color: AppColors.primary),
-                            onPressed: () => _deleteTask(document.id),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              },
-            ),
-          ),
         ],
       ),
     );

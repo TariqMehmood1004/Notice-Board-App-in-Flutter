@@ -1,9 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:app/colors/colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../Widgets/constents/firebase_services.dart';
 
 class HandleUserAuth extends StatefulWidget {
   const HandleUserAuth({super.key});
@@ -14,10 +13,12 @@ class HandleUserAuth extends StatefulWidget {
 
 class _SignUpControllerState extends State<HandleUserAuth> {
 
+  final _userRoleController = TextEditingController();
+  final _userNameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _userRollController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+
+  FirebaseService firebaseService = FirebaseService();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -43,39 +44,50 @@ class _SignUpControllerState extends State<HandleUserAuth> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
-  createUser() async {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-    String userRoll = _userRollController.text.trim();
-    String confirmPassword = _confirmPasswordController.text.trim();
-
-    try {
-      if(email == "" || password == "" || confirmPassword == "" || userRoll == "")
-      {
-        showSnackBar(msg: "Please fill all the required fields.");
-      }
-      else if(password != confirmPassword)
-      {
-        debugPrint("Passwords do not match!");
-        showSnackBar(msg: "Passwords do not match!");
-      } else {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        User? user = userCredential.user;
-
-        // Save user information to Firestore collection
-        await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-          'userRole': _userRollController.text.trim(),
-          'email': _emailController.text.trim(),
-        });
-
-        showSnackBar(msg: "User created successfully.");
-      }
-    }
-    on FirebaseAuthException catch(e){
-      showSnackBar(msg: e.code.toString());
-    }
-  }
+  //
+  // createUser() async {
+  //   String email = _emailController.text.trim();
+  //   String password = _passwordController.text.trim();
+  //   String userRoll = _userNameController.text.trim();
+  //   String confirmPassword = _confirmPasswordController.text.trim();
+  //
+  //   try {
+  //     if(email == "" || password == "" || confirmPassword == "" || userRoll == "")
+  //     {
+  //       showSnackBar(msg: "Please fill all the required fields.");
+  //     }
+  //     else if(password != confirmPassword)
+  //     {
+  //       debugPrint("Passwords do not match!");
+  //       showSnackBar(msg: "Passwords do not match!");
+  //     } else {
+  //       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+  //       User? user = userCredential.user;
+  //
+  //       // Save user information to Firestore collection
+  //       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+  //         'userRole': _userNameController.text.trim(),
+  //         'email': _emailController.text.trim(),
+  //
+  //         /*
+  //         "uid": "user_uid",          // Unique identifier for the user
+  //         "name": "John Doe",         // User's display name
+  //         "email": "johndoe@example.com",   // User's email address
+  //         "blocked": false,           // Boolean field indicating if the user is blocked or not
+  //         "friends": [],              // Array field to store the user's friends' UIDs
+  //         "createdAt": Timestamp,     // Timestamp indicating when the user was created
+  //         // ... additional fields based on your app's requirements
+  //       }
+  //       */
+  //       });
+  //
+  //       showSnackBar(msg: "User created successfully.");
+  //     }
+  //   }
+  //   on FirebaseAuthException catch(e){
+  //     showSnackBar(msg: e.code.toString());
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -113,9 +125,29 @@ class _SignUpControllerState extends State<HandleUserAuth> {
                       child: Column(
                         children: [
                           TextField(
-                            controller: _userRollController,
+                            controller: _userRoleController,
                             decoration: InputDecoration(
-                              labelText: "User Roll",
+                              labelText: "User Role",
+                              icon: const Icon(Icons.verified_user),
+                              iconColor: AppColors.primary,
+                              labelStyle: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 12.0, fontWeight: FontWeight.w300,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.primary),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.primary),
+                              ),
+                            ),
+                            keyboardType: TextInputType.text,
+                          ),
+                          const SizedBox(height: 15.0),
+                          TextField(
+                            controller: _userNameController,
+                            decoration: InputDecoration(
+                              labelText: "User Name",
                               icon: const Icon(Icons.verified_user),
                               iconColor: AppColors.primary,
                               labelStyle: TextStyle(
@@ -173,30 +205,16 @@ class _SignUpControllerState extends State<HandleUserAuth> {
                             obscureText: true,
                           ),
                           const SizedBox(height: 15.0),
-                          TextField(
-                            controller: _confirmPasswordController,
-                            decoration: InputDecoration(
-                              labelText: "Confirm Password",
-                              labelStyle: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.w300,
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.primary),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.primary),
-                              ),
-                              icon: const Icon(Icons.lock),
-                              iconColor: AppColors.primary,
-                            ),
-                            obscureText: true,
-                          ),
-                          const SizedBox(height: 45.0),
                           InkWell(
                             onTap: () {
-                              createUser();
+
+                              firebaseService.registerUserAccount(
+                                  context,
+                                  _userRoleController.text.trim(),
+                                  _userNameController.text.trim(),
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim()
+                              );
                             },
                             child: Ink(
                               child: Container(
